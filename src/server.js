@@ -13,7 +13,7 @@ import './models/user';
 import apiRoutes from './routes';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 
 // Connect to MongoDB through Mongoose
 mongoose.Promise = global.Promise;
