@@ -4,7 +4,7 @@ import * as AccountController from '../controllers/account';
 const app = new Router();
 
 app.route('/')
-  .get(AccountController.getAccounts)
+  .get(AccountController.findAccounts)
   .post(AccountController.createAccount);
 
 export default app;

@@ -4,9 +4,8 @@ const { ObjectId } = Schema.Types;
 
 const AccountSchema = new Schema({
   user: { type: ObjectId, ref: 'User', required: true },
-  active: Boolean,
-  private: Boolean,
-  avatar: String,
+  active: { type: Boolean, default: true },
+  private: { type: Boolean, default: false },
   pay: {
     rate: Number,
     period: Number,

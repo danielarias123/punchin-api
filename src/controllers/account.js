@@ -1,23 +1,18 @@
-import mongoose from 'mongoose';
+import database from '../database';
 
-const Account = mongoose.model('Account');
-
-const getAccounts = (req, res) => {
-  Account.find({}, (err, account) => {
-    if (err) res.send(err);
-    res.json({ response: account });
-  }).populate('user');
+const findAccounts = (req, res) => {
+  database.findAccounts().then(({ error, response: accounts }) => {
+    res.status(error ? 400 : 200).json({ error, response: accounts });
+  });
 };
 
 const createAccount = (req, res) => {
-  const newAccount = new Account(req.body);
-  newAccount.save((err, account) => {
-    if (err) res.send(err);
-    res.json(account);
+  database.createAccount(req.body).then(({ error, response: account }) => {
+    res.status(error ? 400 : 200).json({ error, response: account });
   });
 };
 
 export {
-  getAccounts,
+  findAccounts,
   createAccount,
 };
