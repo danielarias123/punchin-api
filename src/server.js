@@ -9,6 +9,7 @@ import { getDataBaseURI } from './utils/database';
 // Import models
 import './models/account';
 import './models/user';
+import './models/shift';
 
 import apiRoutes from './routes';
 
