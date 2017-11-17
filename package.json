@@ -4,6 +4,7 @@
   "description": "API Interface for PunchIn App",
   "scripts": {
     "start": "babel-node tools/run ./start",
+    "start-forever": "forever start build/server.js -d -f",
     "build": "webpack"
   },
   "author": "Daniel Arias <danielarias_123@msn.com>",
