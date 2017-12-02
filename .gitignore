@@ -1,5 +1,7 @@
 .DS_Store
 build
+functions
 node_modules
 .env
 npm-debug.*
+firebase-debug.*

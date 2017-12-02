@@ -1,31 +1,32 @@
-import mongoose from 'mongoose';
 
-const User = mongoose.model('User');
+import database from '../utils/database';
+import { paginateResponse, documentResponse, errorResponse, createResponse } from '../utils/response';
 
-const createUser = payload => new Promise((resolve) => {
-  const newUser = new User(payload);
-  newUser.save((err, user) => {
-    resolve({ error: err ? err.message : null, response: user });
-  });
+const userDB = database.collection('users');
+
+// Returns all users paginated
+const findUsers = () => new Promise((resolve) => {
+  userDB.get()
+    .then(user => paginateResponse(resolve, user))
+    .catch(error => errorResponse(resolve, error));
 });
 
-const findUser = query => new Promise((resolve) => {
-  User.findOne(query, (err, user) => {
-    const error = !user ? 'User not found' : null;
-    const status = user ? 200 : 401;
-
-    resolve({ status, error, response: user });
-  });
+// Returns a user that matches a query
+const findUser = (field, value) => new Promise((resolve) => {
+  userDB.where(field, '==', value).get()
+    .then(user => documentResponse(resolve, user))
+    .catch(error => errorResponse(resolve, error));
 });
 
-const findUsers = (query = {}) => new Promise((resolve) => {
-  User.find(query, (err, users) => {
-    resolve({ error: err, response: users });
-  });
+// Creates a new user
+const createUser = userPayload => new Promise((resolve) => {
+  userDB.add(userPayload)
+    .then(user => createResponse(resolve, user))
+    .catch(error => errorResponse(resolve, error));
 });
 
 export {
-  createUser,
-  findUser,
   findUsers,
+  findUser,
+  createUser,
 };

@@ -1,28 +1,23 @@
-import mongoose from 'mongoose';
+import database from '../utils/database';
+import { errorResponse, documentResponse, createResponse } from '../utils/response';
 
-const Account = mongoose.model('Account');
+const accountDB = database.collection('accounts');
 
-const createAccount = payload => new Promise((resolve) => {
-  const newAccount = new Account(payload);
-  newAccount.save((err, account) => {
-    resolve({ error: err ? err.message : null, response: account });
-  });
+// Returns an account that matches a query
+const findAccount = (field, value) => new Promise((resolve) => {
+  accountDB.where(field, '==', value).get()
+    .then(account => documentResponse(resolve, account))
+    .catch(error => errorResponse(resolve, error));
 });
 
-const findAccount = query => new Promise((resolve) => {
-  Account.findOne(query, (err, account) => {
-    resolve({ error: err, response: account });
-  }).populate('user');
-});
-
-const findAccounts = (query = {}) => new Promise((resolve) => {
-  Account.find(query, (err, accounts) => {
-    resolve({ error: err, response: accounts });
-  }).populate('user');
+// Creates a new account
+const createAccount = accountPayload => new Promise((resolve) => {
+  accountDB.add(accountPayload)
+    .then(account => createResponse(resolve, account))
+    .catch(error => errorResponse(resolve, error));
 });
 
 export {
   createAccount,
   findAccount,
-  findAccounts,
 };

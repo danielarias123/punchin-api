@@ -1,62 +1,73 @@
+
 import jwt from 'jsonwebtoken';
 import { generate, verify } from 'password-hash';
 import database from '../database';
-import { initializeEnvironment } from '../utils/environment';
+import { apiResponse } from '../utils/response';
 
-// Load environment variables from .env file
-initializeEnvironment();
+// Load environment variables
+require('dotenv').config();
 
 const { JWT_SECRET } = process.env;
 
 // Returns all users
-const findUsers = (req, res) => {
-  database.findUsers().then(({ error, response: users }) => {
-    res.status(error ? 400 : 200).json({ error, response: users });
-  });
+const findUsers = async (req, res) => {
+  const usersResponse = await database.findUsers();
+  apiResponse(res, usersResponse);
 };
 
 // Creates a user
-const createUser = (req, res) => {
-  const { password, ...rest } = req.body;
+const createUser = async (req, res) => {
+  const { password, email, ...rest } = req.body;
   const userPayload = {
+    email,
     password: generate(password),
     ...rest,
   };
 
-  database.createUser(userPayload).then(({ error, response: user }) => {
-    if (error) {
-      res.status(400).json({ error });
-    } else {
-      database.createAccount({ user: user._id }).then(({ error: accountError }) => {
-        if (error) res.status(400).json({ error: accountError });
-        res.json(user);
-      });
-    }
-  });
+  // Check if the user already exists
+  const { response: userFound } = await database.findUser('email', email);
+  if (userFound) return apiResponse(res, { error: 'User with email already exists', status: 400 });
+
+  const userResponse = await database.createUser(userPayload);
+  let createResponse = {};
+  if (userResponse.error) {
+    createResponse = userResponse;
+  } else {
+    // We also create a base account for them
+    createResponse = await database.createAccount({ user: userResponse.response });
+  }
+  return apiResponse(res, createResponse);
 };
 
 // Authenticates a user
-const authenticateUser = (req, res) => {
+const authenticateUser = async (req, res) => {
   const { email, password } = req.body;
-  database.findUser({ email }).then(({ error, status, response: user }) => {
-    if (error) {
-      res.status(status).json({ error });
-    } else if (!verify(password, user.password)) {
-      res.status(401).json({ error: 'Invalid Credentials' });
-    } else {
-      const payload = { admin: user.admin };
-      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
-      // Find the user's account
-      database.findAccount({ user: user._id }).then((accountResponse) => {
-        const { error: accountError, response: account } = accountResponse;
-        res.json({ error: accountError, response: { account, token } });
-      });
-    }
-  });
+  const userResponse = await database.findUser('email', email);
+  const userFound = userResponse.response;
+  // Check if user exists for email
+  if (!userFound) return apiResponse(res, { ...userResponse, error: 'User not found for email' });
+
+  // Check password
+  if (!verify(password, userFound.password)) return apiResponse(res, { error: 'Invalid Credentials', status: 401 });
+
+  // Create a new JWT token since credentails were valid
+  const token = jwt.sign({ data: userFound.id }, JWT_SECRET, { expiresIn: '24h' });
+
+  // Find the user's account
+  const { response: accountFound } = await database.findAccount('user', userFound.id);
+
+  const authResponse = {
+    response: {
+      account: { ...accountFound, user: userFound },
+      token,
+    },
+  };
+
+  return apiResponse(res, authResponse);
 };
 
 export {
-  findUsers,
-  createUser,
   authenticateUser,
+  createUser,
+  findUsers,
 };

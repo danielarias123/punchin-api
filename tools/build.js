@@ -2,26 +2,13 @@
  * Runs webpack for 'webpack.config.js'
  */
 
-import webpack from 'webpack';
-import appConfig from '../webpack.config';
+import run from './run';
+import copy from './copy';
+import bundle from './bundle';
 
-// Runs webpack for both app configs from 'webpack.config.js'
-const build = () =>
-  new Promise((resolve, reject) => {
-    const bundler = webpack(appConfig);
-
-    // Gets called when webpack finishes
-    const onComplete = (err, stats) => {
-      if (err) return reject(err);
-      console.log(stats.toString('minimal'));
-      return resolve();
-    };
-
-    // Recompile automatically on changes if watch is set
-    bundler.watch({
-      aggregateTimeout: 300,
-      poll: true,
-    }, onComplete);
-  });
+const build = async () => {
+  await run(bundle);
+  await run(copy);
+};
 
 export default build;

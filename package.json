@@ -3,19 +3,20 @@
   "version": "1.0.0",
   "description": "API Interface for PunchIn App",
   "scripts": {
-    "start": "babel-node tools/run ./start",
-    "start-forever": "forever start build/server.js -d -f",
-    "build": "webpack"
+    "build": "babel-node tools/run ./build",
+    "postbuild": "cd functions && npm i",
+    "deploy": "npm run build && firebase deploy --only functions",
+    "logs": "firebase functions:log"
   },
   "author": "Daniel Arias <danielarias_123@msn.com>",
   "license": "ISC",
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "dotenv": "^4.0.0",
     "express": "^4.16.2",
+    "firebase-admin": "^5.5.1",
+    "firebase-functions": "^0.7.3",
     "jsonwebtoken": "^8.1.0",
-    "mongoose": "^4.12.4",
-    "mongoose-unique-validator": "^1.0.6",
-    "morgan": "^1.9.0",
-    "node-env-file": "^0.1.8",
     "password-hash": "^1.2.2"
   },
   "devDependencies": {
@@ -30,7 +31,9 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
     "gaze": "^1.1.2",
+    "mkdirp": "^0.5.1",
     "nodemon": "^1.12.1",
+    "rimraf": "^2.6.2",
     "webpack": "^3.8.1"
   }
 }

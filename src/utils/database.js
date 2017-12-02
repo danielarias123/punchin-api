@@ -1,19 +1,9 @@
-import { initializeEnvironment } from './environment';
+// Initialize a Firestore DB instance
 
-// Load environment variables from .env file
-initializeEnvironment();
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 
-const getDataBaseURI = () => {
-  const {
-    MONGO_DB_DSN,
-    MONGO_DB_NAME,
-    MONGO_DB_USER,
-    MONGO_DB_PASSWORD,
-  } = process.env;
+// Initialize Firebase Admin SDK to access the Firebase Realtime Database.
+admin.initializeApp(functions.config().firebase);
 
-  return `mongodb://${MONGO_DB_USER}:${MONGO_DB_PASSWORD}@${MONGO_DB_DSN}/${MONGO_DB_NAME}`;
-};
-
-export {
-  getDataBaseURI,
-};
+export default admin.firestore();
