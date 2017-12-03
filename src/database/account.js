@@ -3,11 +3,13 @@ import Account from '../models/account';
 import { errorResponse, documentResponse, createResponse } from '../utils/response';
 
 const accountDB = database.collection('accounts');
+const userDB = database.collection('users');
 
-// Returns an account that matches a query
-const findAccount = (field, value) => new Promise((resolve) => {
-  accountDB.where(field, '==', value).get()
-    .then(account => documentResponse(resolve, account))
+// Returns an account for a user
+const findUserAccount = userID => new Promise((resolve) => {
+  const userRef = userDB.doc(userID);
+  accountDB.where('user', '==', userRef).get()
+    .then(account => documentResponse(resolve, account, ['user']))
     .catch(error => errorResponse(resolve, error));
 });
 
@@ -20,5 +22,5 @@ const createAccount = accountPayload => new Promise((resolve) => {
 
 export {
   createAccount,
-  findAccount,
+  findUserAccount,
 };

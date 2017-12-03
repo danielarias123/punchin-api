@@ -24,11 +24,11 @@ const authenticate = async (req, res) => {
   const token = jwt.sign({ data: userFound.id }, JWT_SECRET, { expiresIn: '24h' });
 
   // Find the user's account
-  const { response: accountFound } = await database.findAccount('user', userFound.id);
+  const { response: accountFound } = await database.findUserAccount(userFound.id);
 
   const authResponse = {
     response: {
-      account: { ...accountFound, user: userFound },
+      account: accountFound,
       token,
     },
   };

@@ -11,14 +11,27 @@ const createResponse = (res, response) => {
 
 const errorResponse = (res, error) => res({ error, status: res.status });
 
+// Converts a DocumentSnapshot to a readable document
 const snapshotToDocument = snapshot => ({ id: snapshot.id, ...snapshot.data() });
 
 const snapshotToArray = snapshot => snapshot.docs.map(doc => snapshotToDocument(doc));
 
-// Returns a single document or null if not found
-const documentResponse = (res, snapshot) => {
-  const documentsFound = snapshotToArray(snapshot);
+// Returns a single document with populated subdocuments
+const documentResponse = async (res, snapshot, populateFields = []) => {
+  const documentsFound = snapshotToArray(snapshot, populateFields);
   const documentFound = documentsFound.length ? documentsFound[0] : null;
+  if (populateFields.length) {
+    const referenceFields = [];
+    populateFields.forEach(field => documentFound[field] ?
+      referenceFields.push(documentFound[field].get()) : null);
+
+    // Get subdocument snapshots
+    const updatedFields = await Promise.all(referenceFields);
+    // Populate subdocuments
+    populateFields.forEach((field, index) => {
+      documentFound[field] = snapshotToDocument(updatedFields[index]);
+    });
+  }
   const status = !documentFound ? 404 : 200;
   res({ response: documentFound, status });
 };

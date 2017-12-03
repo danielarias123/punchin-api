@@ -1,4 +1,6 @@
-const Shift = payload => ({
+import { attachReferences } from '../utils/references';
+
+const Shift = payload => attachReferences({
   account: null,
   active: true,
   company: null,

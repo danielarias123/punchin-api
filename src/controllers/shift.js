@@ -1,5 +1,6 @@
 
 import database from '../database';
+import { sanitize } from '../utils/request';
 import { apiResponse } from '../utils/response';
 
 // Returns all shifts
@@ -10,10 +11,7 @@ const findShifts = async (req, res) => {
 
 // Creates a shift
 const createShift = async (req, res) => {
-  const { account } = req.body;
-  const shiftPayload = {
-    account,
-  };
+  const shiftPayload = sanitize(req.body);
   const shiftResponse = await database.createShift(shiftPayload);
   apiResponse(res, shiftResponse);
 };

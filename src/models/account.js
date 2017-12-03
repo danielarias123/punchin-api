@@ -1,4 +1,6 @@
-const Account = payload => ({
+import { attachReferences } from '../utils/references';
+
+const Account = payload => attachReferences({
   user: null,
   private: false,
   active: true,
