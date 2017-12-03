@@ -1,28 +1,24 @@
-import mongoose from 'mongoose';
+import database from '../utils/database';
+import Shift from '../models/shift';
+import { errorResponse, paginateResponse, createResponse } from '../utils/response';
 
-const Shift = mongoose.model('Shift');
+const shiftDB = database.collection('shifts');
 
-const createShift = payload => new Promise((resolve) => {
-  const newShift = new Shift(payload);
-  newShift.save((err, shift) => {
-    resolve({ error: err ? err.message : null, response: shift });
-  });
+// Returns all shifts paginated
+const findShifts = () => new Promise((resolve) => {
+  shiftDB.get()
+    .then(shift => paginateResponse(resolve, shift))
+    .catch(error => errorResponse(resolve, error));
 });
 
-const findShift = query => new Promise((resolve) => {
-  Shift.findOne(query, (err, shifts) => {
-    resolve({ error: err, response: shifts });
-  });
-});
-
-const findShifts = (query = {}) => new Promise((resolve) => {
-  Shift.find(query, (err, shifts) => {
-    resolve({ error: err, response: shifts });
-  });
+// Creates a new shift
+const createShift = shiftPayload => new Promise((resolve) => {
+  shiftDB.add(Shift(shiftPayload))
+    .then(shift => createResponse(resolve, shift))
+    .catch(error => errorResponse(resolve, error));
 });
 
 export {
   createShift,
-  findShift,
   findShifts,
 };

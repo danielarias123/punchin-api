@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import * as UserController from '../controllers/user';
+import * as AuthController from '../controllers/auth';
 
 const app = new Router();
 
-app.route('/')
-  .post(UserController.authenticateUser);
+app.route('/authenticate').post(AuthController.authenticate);
+
+app.route('/signup').post(AuthController.signup);
 
 export default app;

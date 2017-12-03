@@ -4,7 +4,6 @@ import * as UserController from '../controllers/user';
 const app = new Router();
 
 app.route('/')
-  .get(UserController.findUsers)
-  .post(UserController.createUser);
+  .get(UserController.findUsers);
 
 export default app;

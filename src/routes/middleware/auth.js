@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
-import { initializeEnvironment } from '../../utils/environment';
+import { apiResponse } from '../../utils/response';
 
-// Load environment variables from .env file
-initializeEnvironment();
+// Load environment variables
+require('dotenv').config();
 
 const { JWT_SECRET } = process.env;
 
@@ -12,18 +12,17 @@ const authCheck = (req, res, next) => {
   const token = req.headers.authorization;
 
   if (token) {
-    jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
-      if (err) {
-        res.status(401).json({ error: 'Authentification Failed' });
-      } else {
-        // If authorized, save token for subsequent requests
-        req.token = decodedToken;
-        next();
-      }
+    jwt.verify(token, JWT_SECRET, (error, decodedToken) => {
+      // Check if token is valid
+      if (error) return apiResponse(res, { status: 401, error: 'Authentification Failed' });
+
+      // Save token for subsequent requests since its valid
+      req.token = decodedToken;
+      return next();
     });
   } else {
     // No token found
-    res.status(401).json({ error: 'No Authentification Token Found' });
+    apiResponse(res, { status: 401, error: 'No Authentification Token Found' });
   }
 };
 

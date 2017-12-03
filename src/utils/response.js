@@ -13,11 +13,7 @@ const errorResponse = (res, error) => res({ error, status: res.status });
 
 const snapshotToDocument = snapshot => ({ id: snapshot.id, ...snapshot.data() });
 
-const snapshotToArray = (snapshot) => {
-  const list = [];
-  snapshot.forEach(doc => list.push(snapshotToDocument(doc)));
-  return list;
-};
+const snapshotToArray = snapshot => snapshot.docs.map(doc => snapshotToDocument(doc));
 
 // Returns a single document or null if not found
 const documentResponse = (res, snapshot) => {

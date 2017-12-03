@@ -1,5 +1,6 @@
 
 import database from '../utils/database';
+import User from '../models/user';
 import { paginateResponse, documentResponse, errorResponse, createResponse } from '../utils/response';
 
 const userDB = database.collection('users');
@@ -20,7 +21,7 @@ const findUser = (field, value) => new Promise((resolve) => {
 
 // Creates a new user
 const createUser = userPayload => new Promise((resolve) => {
-  userDB.add(userPayload)
+  userDB.add(User(userPayload))
     .then(user => createResponse(resolve, user))
     .catch(error => errorResponse(resolve, error));
 });
