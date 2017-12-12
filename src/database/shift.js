@@ -18,7 +18,17 @@ const createShift = shiftPayload => new Promise((resolve) => {
     .catch(error => errorResponse(resolve, error));
 });
 
+// Edits a shift
+const editShift = shiftPayload => new Promise((resolve) => {
+  console.log('shiftPayload.id', shiftPayload.id);
+  const shiftRef = shiftDB.doc(shiftPayload.id);
+  shiftRef.set(Shift(shiftPayload), { merge: true })
+    .then(shift => createResponse(resolve, shift))
+    .catch(error => errorResponse(resolve, error));
+});
+
 export {
   createShift,
+  editShift,
   findShifts,
 };

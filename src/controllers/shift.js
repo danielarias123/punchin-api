@@ -16,7 +16,15 @@ const createShift = async (req, res) => {
   apiResponse(res, shiftResponse);
 };
 
+// Edits a shift
+const editShift = async (req, res) => {
+  const shiftPayload = sanitize(req.body);
+  const shiftResponse = await database.editShift(shiftPayload);
+  apiResponse(res, shiftResponse);
+};
+
 export {
   createShift,
+  editShift,
   findShifts,
 };

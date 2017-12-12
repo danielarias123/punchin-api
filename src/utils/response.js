@@ -4,21 +4,23 @@ const apiResponse = (res, { response = null, error = null, status = 200 }) =>
 
 /* Response formats for database calls */
 
+// Converts a DocumentSnapshot to a readable document
+const snapshotToDocument = snapshot => ({ id: snapshot.id, ...snapshot.data() });
+
 // Returns the newly created document id
-const createResponse = (res, response) => {
-  res({ response: response.id, status: res.status });
+const createResponse = async (res, docRef) => {
+  // Get the document snapshot
+  const documentSnapshot = await docRef.get();
+  res({ response: snapshotToDocument(documentSnapshot), status: res.status });
 };
 
 const errorResponse = (res, error) => res({ error, status: res.status });
 
-// Converts a DocumentSnapshot to a readable document
-const snapshotToDocument = snapshot => ({ id: snapshot.id, ...snapshot.data() });
-
-const snapshotToArray = snapshot => snapshot.docs.map(doc => snapshotToDocument(doc));
+const snapshotToArray = querySnapshot => querySnapshot.docs.map(doc => snapshotToDocument(doc));
 
 // Returns a single document with populated subdocuments
-const documentResponse = async (res, snapshot, populateFields = []) => {
-  const documentsFound = snapshotToArray(snapshot, populateFields);
+const documentResponse = async (res, querySnapshot, populateFields = []) => {
+  const documentsFound = snapshotToArray(querySnapshot, populateFields);
   const documentFound = documentsFound.length ? documentsFound[0] : null;
   if (populateFields.length) {
     const referenceFields = [];
@@ -37,7 +39,7 @@ const documentResponse = async (res, snapshot, populateFields = []) => {
 };
 
 // Returns an array of documents
-const paginateResponse = (res, snapshot) => res({ response: snapshotToArray(snapshot) });
+const paginateResponse = (res, querySnapshot) => res({ response: snapshotToArray(querySnapshot) });
 
 export {
   apiResponse,
