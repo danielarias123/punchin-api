@@ -4,9 +4,9 @@ import { errorResponse, paginateResponse, createResponse } from '../utils/respon
 
 const shiftDB = database.collection('shifts');
 
-// Returns all shifts paginated
+// Returns all shifts paginated in descending order
 const findShifts = () => new Promise((resolve) => {
-  shiftDB.get()
+  shiftDB.orderBy('actual.start.date', 'desc').get()
     .then(shift => paginateResponse(resolve, shift))
     .catch(error => errorResponse(resolve, error));
 });

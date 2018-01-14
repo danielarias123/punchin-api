@@ -1,6 +1,7 @@
 /*
  * Runs webpack for 'webpack.config.js'
  */
+
 import webpack from 'webpack';
 import appConfig from '../webpack.config';
 
